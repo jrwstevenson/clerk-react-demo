@@ -13,6 +13,9 @@ export default function IndexPage() {
             <Link to="/sign-in">Sign In</Link>
           </li>
           <li>
+            <Link to="/sign-in-sso">Sign In SSO</Link>
+          </li>
+          <li>
             <Link to="/contact">Contact</Link>
           </li>
           <li>

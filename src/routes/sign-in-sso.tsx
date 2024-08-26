@@ -1,35 +1,42 @@
 import { useSignIn } from "@clerk/clerk-react"
 import { isClerkAPIResponseError } from "@clerk/clerk-react/errors"
 import { useState } from "react"
-import { Link } from "react-router-dom"
 
 export default function SignInPage() {
   const { signIn } = useSignIn()
 
   const [email, setEmail] = useState("")
-  const [password, setPassword] = useState("123")
   const [errors, setErrors] = useState([])
-  const [SSOError, setSSOError] = useState(false)
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+
+    // Uncommenting the following line will fix my issue, but is not recommended
+    // if (signIn?.id) (signIn as { id?: string }).id = undefined
+
     try {
-      await signIn?.create({ identifier: email, password })
+      signIn
+        ?.authenticateWithRedirect({
+          identifier: email,
+          strategy: "saml",
+          redirectUrl: "/sso-callback",
+          redirectUrlComplete: "/",
+        })
+        .catch((error: unknown) => {
+          if (isClerkAPIResponseError(error)) {
+            setErrors(error.errors)
+          }
+        })
     } catch (e) {
       if (isClerkAPIResponseError(e)) {
         setErrors(e.errors)
-        if (e.errors.some(error => error.longMessage?.toLocaleLowerCase().includes("saml"))) {
-          setSSOError(true)
-        } else {
-          setSSOError(false)
-        }
       }
     }
   }
 
   return (
     <div>
-      <h1>Sign In</h1>
+      <h1>Sign In SSO</h1>
       <form
         onSubmit={handleSubmit}
         style={{
@@ -41,8 +48,6 @@ export default function SignInPage() {
       >
         <label htmlFor="email">Email</label>
         <input id="email" type="email" value={email} onChange={e => setEmail(e.target.value)} />
-        <label htmlFor="password">Password</label>
-        <input type="password" value={password} onChange={e => setPassword(e.target.value)} />
 
         <button name="submit" type="submit">
           Submit
@@ -53,7 +58,6 @@ export default function SignInPage() {
           <li key={error.code}>{error.longMessage}</li>
         ))}
       </ul>
-      {SSOError && <Link to="/sign-in-sso">Click here to login with SSO</Link>}
     </div>
   )
 }

@@ -14,6 +14,7 @@ import SignInPage from './routes/sign-in';
 import SignUpPage from './routes/sign-up';
 import DashboardPage from './routes/dashboard';
 import InvoicesPage from './routes/invoices';
+import SignInSSOPage from './routes/sign-in-sso';
 
 // Loaders and Actions are NOT supported by Clerk at the moment with React Router
 const router = createBrowserRouter([
@@ -23,6 +24,7 @@ const router = createBrowserRouter([
       { path: '/', element: <IndexPage /> },
       { path: '/contact', element: <ContactPage /> },
       { path: '/sign-in/*', element: <SignInPage /> },
+      { path: '/sign-in-sso/*', element: <SignInSSOPage /> },
       { path: '/sign-up/*', element: <SignUpPage /> },
       {
         element: <DashboardLayout />,
